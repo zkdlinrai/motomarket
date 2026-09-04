@@ -51,7 +51,7 @@ Plataforma web moderna tipo **E-commerce y Landing Page** especializada en la **
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/Ryan562/motomarket.git
+   git clone https://github.com/zkdlinrai/motomarket.git
    cd motomarket
    ```
 
