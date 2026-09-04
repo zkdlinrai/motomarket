@@ -1,12 +1,14 @@
 import React from 'react';
-import { MapPin, Star, RefreshCw, ShoppingCart, ArrowRight } from 'lucide-react';
+import { MapPin, Star, RefreshCw, ShoppingCart, Edit, Trash2 } from 'lucide-react';
 import { formatPrice } from '../utils/formatters';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
-  const { setSelectedProductForDetail, setSelectedProductForSwap } = useProducts();
+  const { setSelectedProductForDetail, setSelectedProductForSwap, openEditModal, deleteProduct } = useProducts();
+  const { isAdmin } = useAuth();
 
   const isSale = product.type === 'venta';
 
@@ -19,11 +21,45 @@ export default function ProductCard({ product }) {
     }
   };
 
+  const handleAdminEdit = (e) => {
+    e.stopPropagation();
+    openEditModal(product);
+  };
+
+  const handleAdminDelete = (e) => {
+    e.stopPropagation();
+    if (window.confirm(`¿Eliminar permanentemente "${product.title}"?`)) {
+      deleteProduct(product.id);
+    }
+  };
+
   return (
     <div 
       onClick={() => setSelectedProductForDetail(product)}
       className="bg-white rounded-2xl border border-slate-200/90 hover:border-purple-300 p-3.5 flex flex-col justify-between card-hover-shadow cursor-pointer relative group transition-all"
     >
+      {/* Admin Floating Action Overlay */}
+      {isAdmin && (
+        <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1 bg-black/75 backdrop-blur-xs p-1 rounded-lg border border-amber-400/50 shadow-md">
+          <button
+            type="button"
+            onClick={handleAdminEdit}
+            className="p-1 rounded hover:bg-white/20 text-amber-300 transition-colors"
+            title="Editar repuesto (Admin)"
+          >
+            <Edit className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleAdminDelete}
+            className="p-1 rounded hover:bg-white/20 text-red-400 transition-colors"
+            title="Eliminar repuesto (Admin)"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Top Tag Badge */}
       <div className="flex items-center justify-between w-full mb-2">
         <span
@@ -36,7 +72,7 @@ export default function ProductCard({ product }) {
           {isSale ? 'Venta' : 'Cambio'}
         </span>
 
-        {product.isNewListing && (
+        {product.isNewListing && !isAdmin && (
           <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
             Nuevo
           </span>
@@ -88,7 +124,7 @@ export default function ProductCard({ product }) {
         </div>
       </div>
 
-      {/* Action Buttons: "Ver detalle" and Quick Add */}
+      {/* Action Buttons */}
       <div className="mt-3.5 pt-1 flex items-center gap-2">
         <button
           type="button"

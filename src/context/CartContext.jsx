@@ -2,8 +2,16 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
-const CART_STORAGE_KEY = 'motomarket_cart_items';
-const ORDERS_STORAGE_KEY = 'motomarket_orders_history';
+const CART_STORAGE_KEY = 'bikerparts_cart_items_v2';
+const ORDERS_STORAGE_KEY = 'bikerparts_orders_history_v2';
+const COUPONS_STORAGE_KEY = 'bikerparts_coupons_v2';
+
+const INITIAL_COUPONS = [
+  { code: 'BIKER10', type: 'percent', percent: 10, label: '10% de descuento biker', active: true },
+  { code: 'MOTOFREE', type: 'shipping', freeShipping: true, label: 'Envío nacional gratuito', active: true },
+  { code: 'PROMO20', type: 'percent', percent: 20, label: '20% especial repuestos', active: true },
+  { code: 'BIKERVIP', type: 'percent', percent: 30, label: '30% membresía VIP', active: true }
+];
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
@@ -13,7 +21,6 @@ export function CartProvider({ children }) {
     } catch (e) {
       console.error('Error loading cart from localStorage', e);
     }
-    // Initial sample items matching the badge count (3 items) seen in reference mockup image!
     return [
       {
         id: 'prod-1',
@@ -30,32 +37,68 @@ export function CartProvider({ children }) {
         image: 'https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=600&auto=format&fit=crop&q=80',
         quantity: 1,
         city: 'Medellín'
-      },
-      {
-        id: 'prod-7',
-        title: 'Batería de Gel Magna 12V 7Ah',
-        price: 98000,
-        image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=600&auto=format&fit=crop&q=80',
-        quantity: 1,
-        city: 'Bogotá'
       }
     ];
+  });
+
+  const [coupons, setCoupons] = useState(() => {
+    try {
+      const saved = localStorage.getItem(COUPONS_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return INITIAL_COUPONS;
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [couponCode, setCouponCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState(null); // { code: 'BIKER10', percent: 10 }
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
+
   const [orders, setOrders] = useState(() => {
     try {
       const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) return JSON.parse(saved);
     } catch {
-      return [];
+      // ignore
     }
+    return [
+      {
+        orderId: 'BP-849201',
+        date: '2026-09-02T14:30:00Z',
+        items: [
+          {
+            id: 'prod-4',
+            title: 'Casco integral LS2 Rapid II',
+            price: 320000,
+            quantity: 1,
+            image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=80'
+          }
+        ],
+        subtotal: 320000,
+        discountAmount: 32000,
+        shippingFee: 0,
+        total: 288000,
+        customer: {
+          fullName: 'Juan Camilo Herrera',
+          phone: '+57 312 887 6621',
+          email: 'juancamilo@correo.com',
+          city: 'Barranquilla',
+          address: 'Cra 53 # 79-125, Apto 5B',
+          paymentMethod: 'nequi',
+          paymentDetails: {
+            nequiPhone: '3128876621',
+            nequiIdNumber: '1098234871',
+            nequiAuthType: 'dinamica'
+          }
+        },
+        status: 'Despachado'
+      }
+    ];
   });
 
-  // Sync cart to localStorage
+  // Sync to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
@@ -64,7 +107,14 @@ export function CartProvider({ children }) {
     }
   }, [cartItems]);
 
-  // Sync orders to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(COUPONS_STORAGE_KEY, JSON.stringify(coupons));
+    } catch (e) {
+      console.error('Error saving coupons to localStorage', e);
+    }
+  }, [coupons]);
+
   useEffect(() => {
     try {
       localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
@@ -127,22 +177,73 @@ export function CartProvider({ children }) {
     setAppliedDiscount(null);
   };
 
+  // Coupons application
   const applyCoupon = (code) => {
     const cleanCode = code.trim().toUpperCase();
-    if (cleanCode === 'BIKER10') {
-      setAppliedDiscount({ code: 'BIKER10', percent: 10, label: '10% de descuento comunidad biker' });
-      return { success: true, message: '¡Cupón BIKER10 aplicado! 10% de descuento.' };
-    } else if (cleanCode === 'MOTOFREE') {
-      setAppliedDiscount({ code: 'MOTOFREE', freeShipping: true, label: 'Envío gratis asegurado' });
-      return { success: true, message: '¡Cupón MOTOFREE aplicado! Envío gratuito.' };
+    const found = coupons.find(c => c.code.toUpperCase() === cleanCode && c.active);
+
+    if (found) {
+      setAppliedDiscount(found);
+      return { 
+        success: true, 
+        message: `¡Cupón ${found.code} aplicado! ${found.label}` 
+      };
     } else {
-      return { success: false, message: 'Cupón inválido o expirado. Prueba con "BIKER10" o "MOTOFREE"' };
+      return { 
+        success: false, 
+        message: 'Cupón no encontrado, inactivo o vencido.' 
+      };
     }
   };
 
   const removeCoupon = () => {
     setAppliedDiscount(null);
     setCouponCode('');
+  };
+
+  // Admin Coupon Management
+  const addCoupon = (newCoupon) => {
+    const cleanCode = newCoupon.code.trim().toUpperCase();
+    if (!cleanCode) throw new Error('El código de cupón no puede estar vacío.');
+    if (coupons.some(c => c.code.toUpperCase() === cleanCode)) {
+      throw new Error(`El cupón ${cleanCode} ya existe.`);
+    }
+
+    const created = {
+      code: cleanCode,
+      type: newCoupon.type || 'percent',
+      percent: Number(newCoupon.percent) || 10,
+      freeShipping: !!newCoupon.freeShipping,
+      label: newCoupon.label || `${newCoupon.percent}% de descuento`,
+      active: true
+    };
+
+    setCoupons(prev => [created, ...prev]);
+    return created;
+  };
+
+  const deleteCoupon = (codeToDelete) => {
+    setCoupons(prev => prev.filter(c => c.code !== codeToDelete));
+    if (appliedDiscount?.code === codeToDelete) {
+      setAppliedDiscount(null);
+    }
+  };
+
+  const toggleCouponStatus = (codeToToggle) => {
+    setCoupons(prev =>
+      prev.map(c => c.code === codeToToggle ? { ...c, active: !c.active } : c)
+    );
+  };
+
+  // Admin Order Management
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders(prev =>
+      prev.map(o => o.orderId === orderId ? { ...o, status: newStatus } : o)
+    );
+  };
+
+  const deleteOrder = (orderId) => {
+    setOrders(prev => prev.filter(o => o.orderId !== orderId));
   };
 
   // Calculations
@@ -161,7 +262,7 @@ export function CartProvider({ children }) {
 
   const completeCheckout = (orderDetails) => {
     const newOrder = {
-      orderId: `MOTO-${Math.floor(100000 + Math.random() * 900000)}`,
+      orderId: `BP-${Math.floor(100000 + Math.random() * 900000)}`,
       date: new Date().toISOString(),
       items: [...cartItems],
       subtotal,
@@ -169,7 +270,7 @@ export function CartProvider({ children }) {
       shippingFee: baseShippingFee,
       total,
       customer: orderDetails,
-      status: 'Confirmado - En preparación'
+      status: 'En preparación'
     };
 
     setOrders(prev => [newOrder, ...prev]);
@@ -197,11 +298,17 @@ export function CartProvider({ children }) {
         clearCart,
         couponCode,
         setCouponCode,
+        coupons,
         appliedDiscount,
         applyCoupon,
         removeCoupon,
+        addCoupon,
+        deleteCoupon,
+        toggleCouponStatus,
+        orders,
         completeCheckout,
-        orders
+        updateOrderStatus,
+        deleteOrder
       }}
     >
       {children}

@@ -9,15 +9,14 @@ import {
   Bell, 
   ShoppingCart, 
   PlusCircle, 
-  LogOut, 
-  CheckCircle2 
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
 
 export default function Navbar() {
-  const { currentUser, openAuthModal, setIsProfileModalOpen, logout } = useAuth();
+  const { currentUser, isAdmin, openAuthModal, setIsProfileModalOpen, setIsAdminPanelOpen } = useAuth();
   const { itemCount, setIsCartOpen } = useCart();
   const { 
     setActiveTab, 
@@ -30,7 +29,7 @@ export default function Navbar() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications] = useState([
     { id: 1, title: 'Oferta de intercambio', text: 'Alguien propuso un cambio por tu Pastas de freno', time: 'Hace 10 min', unread: true },
-    { id: 2, title: 'Envío en camino', text: 'Tu pedido MOTO-782910 ha sido despachado', time: 'Hace 1 hora', unread: false },
+    { id: 2, title: 'Envío en camino', text: 'Tu pedido BP-849201 ha sido despachado', time: 'Hace 1 hora', unread: false },
     { id: 3, title: 'Nuevo cupón', text: 'Usa BIKER10 para obtener 10% en tu próxima compra', time: 'Hoy', unread: false }
   ]);
 
@@ -53,22 +52,19 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
-          {/* Logo Brand */}
+          {/* Logo Brand with Official BikerParts Image */}
           <div 
             onClick={resetToHome}
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-600/30 group-hover:scale-105 transition-transform">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18.5" cy="17.5" r="3.5" />
-                <circle cx="5.5" cy="17.5" r="3.5" />
-                <circle cx="15" cy="5" r="1" />
-                <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
-              </svg>
-            </div>
+            <img
+              src="/logo.png"
+              alt="BikerParts Logo"
+              className="h-10 md:h-13 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+            />
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-0.5">
-                Moto<span className="text-purple-400">Market</span>
+                Biker<span className="text-purple-400">Parts</span>
               </span>
               <span className="text-[10px] md:text-xs text-slate-300 font-medium tracking-wide">
                 Repuestos • Venta • Cambio
@@ -140,6 +136,18 @@ export default function Navbar() {
           {/* Right Action Icons & Controls */}
           <div className="flex items-center gap-2 md:gap-3">
             
+            {/* Master Admin Button (Visible only to Admin) */}
+            {isAdmin && (
+              <button
+                onClick={() => setIsAdminPanelOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 text-slate-950 shadow-lg shadow-amber-400/20 transition-all border border-amber-200"
+                title="Abrir Panel de Control Maestro"
+              >
+                <ShieldCheck className="w-4 h-4 text-slate-950" />
+                <span>👑 Panel Admin</span>
+              </button>
+            )}
+
             {/* Quick Publish Button */}
             <button
               onClick={() => setIsPublishModalOpen(true)}
@@ -201,12 +209,14 @@ export default function Navbar() {
               <div 
                 onClick={() => setIsProfileModalOpen(true)}
                 className="flex items-center gap-2 pl-1 cursor-pointer group"
-                title="Ver perfil de motero"
+                title={isAdmin ? "Administrador Maestro" : "Ver perfil de motero"}
               >
                 <img 
                   src={currentUser.avatar} 
                   alt={currentUser.name} 
-                  className="w-8 h-8 md:w-9 md:h-9 rounded-full ring-2 ring-purple-500/70 group-hover:ring-purple-400 transition-all object-cover"
+                  className={`w-8 h-8 md:w-9 md:h-9 rounded-full ring-2 transition-all object-cover ${
+                    isAdmin ? 'ring-amber-400 p-0.5 bg-white' : 'ring-purple-500/70'
+                  }`}
                 />
               </div>
             ) : (

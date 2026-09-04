@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Phone, MapPin, Bike, Check, AlertCircle, Sparkles } from 'lucide-react';
+import { X, User, Mail, Lock, Phone, MapPin, Bike, Check, AlertCircle, Sparkles, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AuthModal() {
@@ -10,7 +10,7 @@ export default function AuthModal() {
     setAuthModalMode,
     register,
     login,
-    users
+    loginAsAdmin
   } = useAuth();
 
   // Login form state
@@ -41,7 +41,7 @@ export default function AuthModal() {
       setTimeout(() => {
         setSuccessMsg('');
         closeAuthModal();
-      }, 1000);
+      }, 900);
     } catch (err) {
       setError(err.message);
     }
@@ -62,30 +62,36 @@ export default function AuthModal() {
       setTimeout(() => {
         setSuccessMsg('');
         closeAuthModal();
-      }, 1200);
+      }, 1000);
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleDemoLogin = () => {
+  const handleMasterAdminLogin = () => {
     setError('');
-    try {
-      login('alejandro.biker@motomarket.co', '');
+    loginAsAdmin();
+    setSuccessMsg('¡Bienvenido, Administrador Maestro!');
+    setTimeout(() => {
+      setSuccessMsg('');
       closeAuthModal();
-    } catch (e) {
-      console.log(e);
-    }
+    }, 800);
+  };
+
+  const handleDemoUserLogin = () => {
+    setError('');
+    login('alejandro.biker@bikerparts.co', '');
+    closeAuthModal();
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
       <div 
         className="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-purple-200 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-purple-900 to-indigo-950 p-6 text-white text-center relative">
+        {/* Header with gradient and Logo */}
+        <div className="bg-gradient-to-r from-purple-950 via-[#19132c] to-[#0a0a12] p-6 text-white text-center relative">
           <button
             onClick={closeAuthModal}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
@@ -93,19 +99,21 @@ export default function AuthModal() {
             <X className="w-4 h-4" />
           </button>
 
-          <div className="w-12 h-12 rounded-2xl bg-purple-600/40 border border-purple-400/40 flex items-center justify-center mx-auto mb-2 shadow-inner">
-            <User className="w-6 h-6 text-purple-200" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="BikerParts"
+            className="h-12 w-auto mx-auto mb-2 object-contain drop-shadow"
+          />
 
           <h3 className="font-black text-xl tracking-tight">
-            Comunidad <span className="text-purple-300">MotoMarket</span>
+            Comunidad <span className="text-purple-400">BikerParts</span>
           </h3>
           <p className="text-xs text-purple-200 mt-0.5">
-            Compra, vende o intercambia repuestos de motos
+            Plataforma oficial de venta y cambio de repuestos
           </p>
 
           {/* Tab Switcher */}
-          <div className="flex bg-black/30 p-1 rounded-xl mt-4 max-w-xs mx-auto">
+          <div className="flex bg-black/40 p-1 rounded-xl mt-4 max-w-xs mx-auto">
             <button
               onClick={() => {
                 setAuthModalMode('login');
@@ -166,7 +174,7 @@ export default function AuthModal() {
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="tu@correo.com"
+                    placeholder="tu@correo.com o admin@bikerparts.co"
                     className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   />
                 </div>
@@ -196,14 +204,24 @@ export default function AuthModal() {
                 Ingresar a mi cuenta
               </button>
 
-              <div className="pt-2 border-t border-slate-100 text-center">
+              {/* Quick Access Buttons for Demo and Master Admin */}
+              <div className="pt-3 border-t border-slate-100 space-y-2">
                 <button
                   type="button"
-                  onClick={handleDemoLogin}
+                  onClick={handleMasterAdminLogin}
+                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-amber-400/20 transition-all"
+                >
+                  <ShieldCheck className="w-4 h-4 text-slate-950" />
+                  <span>👑 Acceso Administrador Maestro (1 Clic)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDemoUserLogin}
                   className="w-full py-2 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Entrar con cuenta Demo (1 Clic)</span>
+                  <span>Entrar como Usuario Motero Demo</span>
                 </button>
               </div>
             </form>
@@ -305,7 +323,7 @@ export default function AuthModal() {
                     required
                     value={registerData.password}
                     onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    placeholder="Crea una contraseña segura"
+                    placeholder="Crea tu contraseña segura"
                     className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   />
                 </div>
@@ -321,7 +339,7 @@ export default function AuthModal() {
               </div>
 
               <p className="text-[10px] text-center text-slate-400">
-                Al registrarte aceptas las políticas de permuta y compra segura de MotoMarket.
+                Al registrarte aceptas las políticas de compra y permuta segura de BikerParts.
               </p>
             </form>
           )}

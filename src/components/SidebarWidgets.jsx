@@ -15,10 +15,10 @@ export default function SidebarWidgets() {
   return (
     <aside className="space-y-6">
       
-      {/* Widget 1: ¿Por qué elegir MotoMarket? */}
+      {/* Widget 1: ¿Por qué elegir BikerParts? */}
       <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs">
         <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-          ¿Por qué elegir MotoMarket?
+          ¿Por qué elegir BikerParts?
         </h3>
         
         <ul className="space-y-3 text-xs text-slate-600">

@@ -20,6 +20,8 @@ import AiAssistantModal from './components/AiAssistantModal';
 import SwapModal from './components/SwapModal';
 import GuidesModal from './components/GuidesModal';
 import ForumModal from './components/ForumModal';
+import AdminPanelModal from './components/AdminPanelModal';
+import EditProductModal from './components/EditProductModal';
 
 function MainApp() {
   return (
@@ -28,7 +30,7 @@ function MainApp() {
       <Navbar />
 
       <main className="flex-grow">
-        {/* Dark Hero with cyber bike background, IA Buscador and IA Asistente Moto_ */}
+        {/* Dark Hero with cyber bike background, IA Buscador and IA Asistente Biker_ */}
         <HeroBanner />
 
         {/* 4 horizontal value badges */}
@@ -55,6 +57,8 @@ function MainApp() {
       <SwapModal />
       <GuidesModal />
       <ForumModal />
+      <AdminPanelModal />
+      <EditProductModal />
     </div>
   );
 }

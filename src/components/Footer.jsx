@@ -15,17 +15,14 @@ export default function Footer() {
           {/* Col 1 & 2: Brand */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-700 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-purple-600/30">
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <circle cx="18.5" cy="17.5" r="3.5" />
-                  <circle cx="5.5" cy="17.5" r="3.5" />
-                  <circle cx="15" cy="5" r="1" />
-                  <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
-                </svg>
-              </div>
+              <img
+                src="/logo.png"
+                alt="BikerParts Logo"
+                className="h-12 w-auto object-contain drop-shadow"
+              />
               <div>
                 <span className="text-xl font-black text-white">
-                  Moto<span className="text-purple-400">Market</span>
+                  Biker<span className="text-purple-400">Parts</span>
                 </span>
                 <span className="text-[10px] text-slate-400 block -mt-1 font-medium">
                   Repuestos • Venta • Cambio
@@ -48,7 +45,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-purple-400" />
-                <span>contacto@motomarket.co</span>
+                <span>contacto@bikerparts.co</span>
               </div>
             </div>
           </div>
@@ -147,7 +144,7 @@ export default function Footer() {
         {/* Bottom copyright and legal */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
           <div className="flex items-center gap-1">
-            <span>© 2026 MotoMarket Colombia. Todos los derechos reservados. Hecho con pasión biker</span>
+            <span>© 2026 BikerParts Colombia. Todos los derechos reservados. Hecho con pasión biker</span>
             <Heart className="w-3 h-3 text-purple-500 inline fill-purple-500" />
           </div>
 

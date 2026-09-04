@@ -9,7 +9,7 @@ export default function AiAssistantModal() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: '¡Hola motero! 🏍️ Soy tu Asistente IA de MotoMarket. Te ayudo a resolver dudas mecánicas, verificar compatibilidad de repuestos para tu moto y encontrar los mejores precios o permutas en nuestra plataforma.',
+      text: '¡Hola motero! 🏍️ Soy tu Asistente IA de BikerParts. Te ayudo a resolver dudas mecánicas, verificar compatibilidad de repuestos para tu moto y encontrar los mejores precios o permutas en nuestra plataforma.',
       recommendation: null
     }
   ]);
@@ -66,7 +66,7 @@ export default function AiAssistantModal() {
 
     if (q.includes('cambio') || q.includes('permuta') || q.includes('intercambio')) {
       return {
-        text: '¡El sistema de cambio de MotoMarket es genial! Puedes entrar a la pestaña "Repuestos para cambio", ver qué busca el dueño (ej. un filtro a cambio de llanta) y proponerle tu repuesto. Todo queda registrado de forma segura.',
+        text: '¡El sistema de cambio de BikerParts es genial! Puedes entrar a la pestaña "Repuestos para cambio", ver qué busca el dueño (ej. un filtro a cambio de llanta) y proponerle tu repuesto. Todo queda registrado de forma segura.',
         recommendation: null
       };
     }
@@ -113,7 +113,7 @@ export default function AiAssistantModal() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-sm sm:text-base">IA Asistente Moto_</h3>
+                <h3 className="font-black text-sm sm:text-base">IA Asistente Biker_</h3>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               </div>
               <p className="text-[11px] text-purple-200">Asesoría mecánica y compatibilidad de repuestos</p>

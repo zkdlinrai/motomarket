@@ -3,8 +3,8 @@ import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
 const ProductsContext = createContext();
 
-const PRODUCTS_STORAGE_KEY = 'motomarket_products_v2';
-const SWAP_STORAGE_KEY = 'motomarket_swap_proposals';
+const PRODUCTS_STORAGE_KEY = 'bikerparts_products_v3';
+const SWAP_STORAGE_KEY = 'bikerparts_swap_proposals_v3';
 
 export function ProductsProvider({ children }) {
   const [products, setProducts] = useState(() => {
@@ -38,6 +38,8 @@ export function ProductsProvider({ children }) {
   // Modal States
   const [selectedProductForDetail, setSelectedProductForDetail] = useState(null);
   const [selectedProductForSwap, setSelectedProductForSwap] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isGuidesModalOpen, setIsGuidesModalOpen] = useState(false);
@@ -68,7 +70,7 @@ export function ProductsProvider({ children }) {
       reviewsCount: 1,
       isNewListing: true,
       createdAt: new Date().toISOString().split('T')[0],
-      stock: 1,
+      stock: 5,
       ...newProductData
     };
 
@@ -76,16 +78,52 @@ export function ProductsProvider({ children }) {
     return newProduct;
   };
 
+  const updateProduct = (productId, updatedData) => {
+    setProducts(prev =>
+      prev.map(p => p.id === productId ? { ...p, ...updatedData } : p)
+    );
+    if (selectedProductForDetail?.id === productId) {
+      setSelectedProductForDetail(prev => ({ ...prev, ...updatedData }));
+    }
+  };
+
+  const deleteProduct = (productId) => {
+    setProducts(prev => prev.filter(p => p.id !== productId));
+    if (selectedProductForDetail?.id === productId) {
+      setSelectedProductForDetail(null);
+    }
+  };
+
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditingProduct(null);
+    setIsEditModalOpen(false);
+  };
+
   const proposeSwap = (proposal) => {
     const newProposal = {
       id: `swap-${Date.now()}`,
       date: new Date().toISOString(),
-      status: 'Pendiente de respuesta del vendedor',
+      status: 'Pendiente de respuesta',
       ...proposal
     };
 
     setSwapProposals(prev => [newProposal, ...prev]);
     return newProposal;
+  };
+
+  const updateSwapStatus = (swapId, newStatus) => {
+    setSwapProposals(prev =>
+      prev.map(s => s.id === swapId ? { ...s, status: newStatus } : s)
+    );
+  };
+
+  const deleteSwapProposal = (swapId) => {
+    setSwapProposals(prev => prev.filter(s => s.id !== swapId));
   };
 
   // Filtered products calculation
@@ -110,7 +148,7 @@ export function ProductsProvider({ children }) {
         const matchesCity = product.city.toLowerCase().includes(q);
         const matchesTags = product.tags?.some(tag => tag.toLowerCase().includes(q));
         const matchesBikes = product.compatibleBikes?.some(bike => bike.toLowerCase().includes(q));
-        const matchesDesc = product.description.toLowerCase().includes(q);
+        const matchesDesc = product.description?.toLowerCase().includes(q);
 
         if (!matchesTitle && !matchesCategory && !matchesCity && !matchesTags && !matchesBikes && !matchesDesc) {
           return false;
@@ -138,6 +176,10 @@ export function ProductsProvider({ children }) {
         setSelectedProductForDetail,
         selectedProductForSwap,
         setSelectedProductForSwap,
+        editingProduct,
+        isEditModalOpen,
+        openEditModal,
+        closeEditModal,
         isPublishModalOpen,
         setIsPublishModalOpen,
         isAiModalOpen,
@@ -147,8 +189,12 @@ export function ProductsProvider({ children }) {
         isForumModalOpen,
         setIsForumModalOpen,
         addProduct,
+        updateProduct,
+        deleteProduct,
         proposeSwap,
-        swapProposals
+        swapProposals,
+        updateSwapStatus,
+        deleteSwapProposal
       }}
     >
       {children}
